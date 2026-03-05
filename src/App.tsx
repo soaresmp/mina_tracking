@@ -5,6 +5,7 @@ import MapView from './components/MapView/MapView';
 import Registry from './components/Registry/Registry';
 import Statistics from './components/Statistics/Statistics';
 import Compliance from './components/Compliance/Compliance';
+import DataSources from './components/DataSources/DataSources';
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>('dashboard');
@@ -17,6 +18,7 @@ const App: React.FC = () => {
       case 'registry': return <Registry />;
       case 'statistics': return <Statistics />;
       case 'compliance': return <Compliance />;
+      case 'sources': return <DataSources />;
       default: return <Dashboard />;
     }
   };
@@ -66,7 +68,8 @@ const App: React.FC = () => {
                activePage === 'map' ? 'Mining Operations Map' :
                activePage === 'registry' ? 'Licensing Registry' :
                activePage === 'statistics' ? 'Statistics & Analytics' :
-               'Compliance & Regulatory'}
+               activePage === 'compliance' ? 'Compliance & Regulatory' :
+               'Data Sources & References'}
             </span>
           </div>
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type Page = 'dashboard' | 'map' | 'registry' | 'statistics' | 'compliance';
+export type Page = 'dashboard' | 'map' | 'registry' | 'statistics' | 'compliance' | 'sources';
 
 interface NavItem {
   id: Page;
@@ -14,7 +14,8 @@ const navItems: NavItem[] = [
   { id: 'map', label: 'Mining Map', icon: '🗺️', description: 'Sites & hotspots' },
   { id: 'registry', label: 'Registry', icon: '📋', description: 'Licensed actors & sites' },
   { id: 'statistics', label: 'Analytics', icon: '📈', description: 'Production & exports' },
-  { id: 'compliance', label: 'Compliance', icon: '✅', description: 'EITI, KYC, KYB' }
+  { id: 'compliance', label: 'Compliance', icon: '✅', description: 'EITI, KYC, KYB' },
+  { id: 'sources', label: 'Data Sources', icon: '🔗', description: '21 referenced datasets' }
 ];
 
 interface SidebarProps {
