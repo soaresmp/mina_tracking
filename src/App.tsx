@@ -6,10 +6,23 @@ import Registry from './components/Registry/Registry';
 import Statistics from './components/Statistics/Statistics';
 import Compliance from './components/Compliance/Compliance';
 import DataSources from './components/DataSources/DataSources';
+import { useWindowSize } from './hooks/useWindowSize';
+
+const pageTitle = (page: Page) => {
+  switch (page) {
+    case 'dashboard': return 'Dashboard';
+    case 'map': return 'Mining Map';
+    case 'registry': return 'Registry';
+    case 'statistics': return 'Analytics';
+    case 'compliance': return 'Compliance';
+    case 'sources': return 'Data Sources';
+  }
+};
 
 const App: React.FC = () => {
   const [activePage, setActivePage] = useState<Page>('dashboard');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const { isMobile } = useWindowSize();
 
   const renderPage = () => {
     switch (activePage) {
@@ -32,12 +45,14 @@ const App: React.FC = () => {
       color: '#e2e8f0',
       overflow: 'hidden'
     }}>
-      <Sidebar
-        activePage={activePage}
-        onNavigate={setActivePage}
-        collapsed={sidebarCollapsed}
-        onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
-      />
+      {!isMobile && (
+        <Sidebar
+          activePage={activePage}
+          onNavigate={setActivePage}
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+      )}
       <main style={{
         flex: 1,
         overflow: 'hidden',
@@ -50,55 +65,66 @@ const App: React.FC = () => {
           height: 52,
           borderBottom: '1px solid #1e293b',
           display: 'flex', alignItems: 'center',
-          padding: '0 20px',
-          gap: 16,
+          padding: isMobile ? '0 12px' : '0 20px',
+          gap: 12,
           background: '#0f1117',
           flexShrink: 0
         }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
             <span style={{ fontSize: 18 }}>🇲🇿</span>
-            <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>
-              Republic of Mozambique
-            </span>
-            <span style={{ color: '#334155', fontSize: 13 }}>/</span>
+            {!isMobile && (
+              <>
+                <span style={{ fontSize: 13, color: '#94a3b8', fontWeight: 500 }}>
+                  Republic of Mozambique
+                </span>
+                <span style={{ color: '#334155', fontSize: 13 }}>/</span>
+              </>
+            )}
             <span style={{ fontSize: 13, color: '#f1f5f9', fontWeight: 600 }}>
-              {activePage === 'dashboard' ? 'Government Dashboard' :
-               activePage === 'map' ? 'Mining Operations Map' :
-               activePage === 'registry' ? 'Licensing Registry' :
-               activePage === 'statistics' ? 'Statistics & Analytics' :
-               activePage === 'compliance' ? 'Compliance & Regulatory' :
-               'Data Sources & References'}
+              {pageTitle(activePage)}
             </span>
           </div>
 
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* System status indicators */}
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <div style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981' }} />
-              <span style={{ fontSize: 11, color: '#475569' }}>Systems Normal</span>
+              <span style={{ fontSize: 11, color: '#475569' }}>
+                {isMobile ? 'Live' : 'Systems Normal'}
+              </span>
             </div>
-            <div style={{ width: 1, height: 16, background: '#1e293b' }} />
-            <div style={{ fontSize: 11, color: '#475569' }}>
-              MIREME • INAMI • DNGRM
-            </div>
-            <div style={{ width: 1, height: 16, background: '#1e293b' }} />
-            <div style={{
-              background: '#f59e0b22', border: '1px solid #f59e0b44',
-              color: '#f59e0b', padding: '3px 10px', borderRadius: 6,
-              fontSize: 11, fontWeight: 600
-            }}>
-              RESTRICTED — GOVERNMENT USE
-            </div>
+            {!isMobile && (
+              <>
+                <div style={{ width: 1, height: 16, background: '#1e293b' }} />
+                <div style={{ fontSize: 11, color: '#475569' }}>
+                  MIREME • INAMI • DNGRM
+                </div>
+                <div style={{ width: 1, height: 16, background: '#1e293b' }} />
+                <div style={{
+                  background: '#f59e0b22', border: '1px solid #f59e0b44',
+                  color: '#f59e0b', padding: '3px 10px', borderRadius: 6,
+                  fontSize: 11, fontWeight: 600
+                }}>
+                  RESTRICTED — GOVERNMENT USE
+                </div>
+              </>
+            )}
           </div>
         </div>
 
         {/* Page Content */}
-        <div style={{ flex: 1, overflow: 'hidden' }}>
+        <div style={{ flex: 1, overflow: 'hidden', paddingBottom: isMobile ? 60 : 0 }}>
           {renderPage()}
         </div>
       </main>
+
+      {isMobile && (
+        <Sidebar
+          activePage={activePage}
+          onNavigate={setActivePage}
+          collapsed={sidebarCollapsed}
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+        />
+      )}
 
       <style>{`
         @keyframes pulse {

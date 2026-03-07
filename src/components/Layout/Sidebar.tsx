@@ -1,4 +1,5 @@
 import React from 'react';
+import { useWindowSize } from '../../hooks/useWindowSize';
 
 export type Page = 'dashboard' | 'map' | 'registry' | 'statistics' | 'compliance' | 'sources';
 
@@ -15,7 +16,7 @@ const navItems: NavItem[] = [
   { id: 'registry', label: 'Registry', icon: '📋', description: 'Licensed actors & sites' },
   { id: 'statistics', label: 'Analytics', icon: '📈', description: 'Production & exports' },
   { id: 'compliance', label: 'Compliance', icon: '✅', description: 'EITI, KYC, KYB' },
-  { id: 'sources', label: 'Data Sources', icon: '🔗', description: '21 referenced datasets' }
+  { id: 'sources', label: 'Sources', icon: '🔗', description: '21 referenced datasets' }
 ];
 
 interface SidebarProps {
@@ -26,6 +27,40 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ activePage, onNavigate, collapsed, onToggle }) => {
+  const { isMobile } = useWindowSize();
+
+  if (isMobile) {
+    return (
+      <nav style={{
+        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 200,
+        background: '#0f1117', borderTop: '1px solid #1e293b',
+        display: 'flex', height: 60
+      }}>
+        {navItems.map(item => {
+          const isActive = activePage === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => onNavigate(item.id)}
+              style={{
+                flex: 1, display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 2,
+                border: 'none', cursor: 'pointer', background: 'transparent',
+                borderTop: isActive ? '2px solid #3b82f6' : '2px solid transparent',
+                paddingTop: 2
+              }}
+            >
+              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span style={{ fontSize: 9, color: isActive ? '#3b82f6' : '#475569', fontWeight: isActive ? 700 : 500 }}>
+                {item.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
+    );
+  }
+
   return (
     <div style={{
       width: collapsed ? 64 : 220,

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useWindowSize } from '../../hooks/useWindowSize';
 import {
   BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell, Legend, RadarChart, Radar,
@@ -14,6 +15,7 @@ type StatTab = 'production' | 'exports' | 'provinces' | 'audit';
 
 const Statistics: React.FC = () => {
   const [tab, setTab] = useState<StatTab>('production');
+  const { isMobile } = useWindowSize();
 
   const totalProductionYTD = miningSites.reduce((s, m) => s + m.ytdProductionOz, 0);
   const totalExportValueYTD = exportBreakdown.reduce((s, e) => s + e.valueUSD, 0);
@@ -63,7 +65,7 @@ const Statistics: React.FC = () => {
   const auditStatusColor = (s: string) => s === 'cleared' ? '#10b981' : s === 'under_review' ? '#f59e0b' : '#ef4444';
 
   return (
-    <div style={{ padding: '24px', overflowY: 'auto', height: '100%' }}>
+    <div style={{ padding: isMobile ? '16px 12px' : '24px', overflowY: 'auto', height: '100%' }}>
       <div style={{ marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>
           Statistics & Analytics
@@ -95,7 +97,7 @@ const Statistics: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div style={{ display: 'flex', gap: 4, background: '#1e2433', padding: 4, borderRadius: 10, marginBottom: 20, width: 'fit-content' }}>
+      <div style={{ display: 'flex', gap: 4, background: '#1e2433', padding: 4, borderRadius: 10, marginBottom: 20, overflowX: 'auto', WebkitOverflowScrolling: 'touch' } as React.CSSProperties}>
         {tabs.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             style={{
@@ -112,7 +114,7 @@ const Statistics: React.FC = () => {
       {/* Production Tab */}
       {tab === 'production' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
             {/* Monthly Production */}
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20, gridColumn: '1 / -1' }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Monthly Gold Production & Exports</h3>
@@ -212,7 +214,7 @@ const Statistics: React.FC = () => {
       {/* Exports Tab */}
       {tab === 'exports' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20 }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Export Value by Destination (YTD)</h3>
               <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Verified export shipments — USD value</p>
@@ -302,7 +304,7 @@ const Statistics: React.FC = () => {
       {/* Provinces Tab */}
       {tab === 'provinces' && (
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20 }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Production by Province</h3>
               <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>YTD gold ounces per province</p>

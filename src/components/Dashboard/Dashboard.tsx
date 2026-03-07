@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useWindowSize } from '../../hooks/useWindowSize';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
@@ -97,6 +98,7 @@ const AlertItem: React.FC<{ alert: typeof recentAlerts[0] }> = ({ alert }) => {
 
 const Dashboard: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const { isMobile } = useWindowSize();
 
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -119,16 +121,18 @@ const Dashboard: React.FC = () => {
   });
 
   return (
-    <div style={{ padding: '24px', overflowY: 'auto', height: '100%' }}>
+    <div style={{ padding: isMobile ? '16px 12px' : '24px', overflowY: 'auto', height: '100%' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, flexWrap: 'wrap', gap: 8 }}>
         <div>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>
-            Government Operations Dashboard
+          <h1 style={{ fontSize: isMobile ? 18 : 24, fontWeight: 700, color: '#f1f5f9', margin: 0 }}>
+            {isMobile ? 'Operations Dashboard' : 'Government Operations Dashboard'}
           </h1>
-          <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
-            Near Real-Time Overview — Republic of Mozambique Gold Sector
-          </p>
+          {!isMobile && (
+            <p style={{ color: '#64748b', fontSize: 14, marginTop: 4 }}>
+              Near Real-Time Overview — Republic of Mozambique Gold Sector
+            </p>
+          )}
         </div>
         <div style={{ textAlign: 'right' }}>
           <div style={{
@@ -139,10 +143,12 @@ const Dashboard: React.FC = () => {
             <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#10b981', animation: 'pulse 2s infinite' }} />
             <span style={{ fontSize: 13, color: '#10b981', fontWeight: 600 }}>LIVE</span>
           </div>
-          <div style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>
-            {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-            {' '}CAT • {currentTime.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-          </div>
+          {!isMobile && (
+            <div style={{ fontSize: 13, color: '#475569', marginTop: 6 }}>
+              {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              {' '}CAT • {currentTime.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+            </div>
+          )}
         </div>
       </div>
 
@@ -232,7 +238,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts Row 1 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 20, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '2fr 1fr', gap: 16, marginBottom: 16 }}>
         {/* Production & Export Trend */}
         <div style={{
           background: '#1e2433', border: '1px solid #2d3748',
@@ -293,7 +299,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Charts Row 2 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 20 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
         {/* Revenue & Royalties */}
         <div style={{
           background: '#1e2433', border: '1px solid #2d3748',
