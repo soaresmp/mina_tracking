@@ -4,15 +4,10 @@
     <meta charset="utf-8" />
     <title>MINATRACK</title>
     <script>
-      // GitHub Pages SPA redirect: store the path and redirect to index
-      var path = window.location.pathname;
-      var search = window.location.search;
-      var hash = window.location.hash;
-      var redirectUrl = window.location.origin + window.location.pathname.split('/')[1] ?
-        window.location.origin + '/' + window.location.pathname.split('/')[1] + '/' :
-        window.location.origin + '/';
-      sessionStorage.setItem('spa_redirect', path + search + hash);
-      window.location.replace(redirectUrl);
+      // GitHub Pages SPA redirect: send any 404 back to the app root
+      var segment = window.location.pathname.split('/')[1];
+      var base = segment ? '/' + segment + '/' : '/';
+      window.location.replace(window.location.origin + base);
     </script>
   </head>
   <body></body>
