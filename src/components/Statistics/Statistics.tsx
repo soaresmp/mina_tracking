@@ -13,11 +13,14 @@ import { miningSites } from '../../data/miningSites';
 
 type StatTab = 'production' | 'exports' | 'provinces' | 'audit';
 
+const OZ_TO_KG = 0.0311035;
+
 const Statistics: React.FC = () => {
   const [tab, setTab] = useState<StatTab>('production');
   const { isMobile } = useWindowSize();
 
   const totalProductionYTD = miningSites.reduce((s, m) => s + m.ytdProductionOz, 0);
+  const totalProductionYTDKg = +(totalProductionYTD * OZ_TO_KG).toFixed(1);
   const totalExportValueYTD = exportBreakdown.reduce((s, e) => s + e.valueUSD, 0);
   const totalWorkersAll = miningSites.reduce((s, m) => s + m.workers, 0);
 
@@ -27,8 +30,8 @@ const Statistics: React.FC = () => {
     .sort((a, b) => b.ytdProductionOz - a.ytdProductionOz)
     .map(s => ({
       name: s.name.length > 22 ? s.name.substring(0, 22) + '…' : s.name,
-      production: s.ytdProductionOz,
-      capacity: s.annualCapacityOz,
+      production: +(s.ytdProductionOz * OZ_TO_KG).toFixed(1),
+      capacity: +(s.annualCapacityOz * OZ_TO_KG).toFixed(1),
       utilisation: Math.round((s.ytdProductionOz / s.annualCapacityOz) * 100)
     }));
 
@@ -38,9 +41,19 @@ const Statistics: React.FC = () => {
     revenue: +(m.revenueUSD / 1000000).toFixed(2),
     royalties: +(m.royaltiesUSD / 1000).toFixed(0),
     taxes: +(m.taxesUSD / 1000).toFixed(0),
-    production: m.productionOz,
-    exports: m.exportOz,
+    production: +(m.productionOz * OZ_TO_KG).toFixed(1),
+    exports: +(m.exportOz * OZ_TO_KG).toFixed(1),
     miners: m.activeMiners
+  }));
+
+  const exportBreakdownKg = exportBreakdown.map(e => ({
+    ...e,
+    quantityKg: +(e.quantityOz * OZ_TO_KG).toFixed(1)
+  }));
+
+  const provinceStatsKg = provinceStats.map(p => ({
+    ...p,
+    productionKg: +(p.productionOz * OZ_TO_KG).toFixed(1)
   }));
 
   // Radar data for site comparison
@@ -78,7 +91,7 @@ const Statistics: React.FC = () => {
       {/* Summary Cards */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 14, marginBottom: 24 }}>
         {[
-          { label: 'Total YTD Production', value: `${totalProductionYTD.toLocaleString()} oz`, color: '#f59e0b', icon: '⛏️' },
+          { label: 'Total YTD Production', value: `${totalProductionYTDKg.toLocaleString()} kg`, color: '#f59e0b', icon: '⛏️' },
           { label: 'Export Value YTD', value: `$${(totalExportValueYTD / 1000000).toFixed(1)}M`, color: '#10b981', icon: '📦' },
           { label: 'Royalties Collected', value: `$${(monthlyStats.reduce((s, m) => s + m.royaltiesUSD, 0) / 1000000).toFixed(2)}M`, color: '#3b82f6', icon: '🏛️' },
           { label: 'Total Registered Workers', value: totalWorkersAll.toLocaleString(), color: '#8b5cf6', icon: '👷' },
@@ -118,15 +131,15 @@ const Statistics: React.FC = () => {
             {/* Monthly Production */}
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20, gridColumn: '1 / -1' }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Monthly Gold Production & Exports</h3>
-              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>All licensed sites combined — ounces per month</p>
+              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>All licensed sites combined — kilograms per month</p>
               <ResponsiveContainer width="100%" height={260}>
                 <LineChart data={revenueData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
                   <XAxis dataKey="month" tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} />
-                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => `${(v / 1000).toFixed(0)}k`} />
+                  <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} tickFormatter={v => `${v.toFixed(0)} kg`} />
                   <Tooltip
                     contentStyle={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 8 }}
-                    formatter={(v: number, name: string) => [`${v.toLocaleString()} oz`, name]}
+                    formatter={(v: number, name: string) => [`${v.toFixed(1)} kg`, name]}
                   />
                   <Line type="monotone" dataKey="production" stroke="#f59e0b" strokeWidth={2} dot={{ fill: '#f59e0b', r: 4 }} name="Production" />
                   <Line type="monotone" dataKey="exports" stroke="#10b981" strokeWidth={2} dot={{ fill: '#10b981', r: 4 }} name="Exports" />
@@ -138,7 +151,7 @@ const Statistics: React.FC = () => {
             {/* Site Production Comparison */}
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20 }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Production by Site (YTD)</h3>
-              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Ounces produced vs annual capacity</p>
+              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>kg produced vs annual capacity</p>
               <ResponsiveContainer width="100%" height={240}>
                 <BarChart data={siteProductionData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" horizontal={false} />
@@ -147,7 +160,7 @@ const Statistics: React.FC = () => {
                   <YAxis type="category" dataKey="name" tick={{ fill: '#94a3b8', fontSize: 10 }} width={120} tickLine={false} />
                   <Tooltip
                     contentStyle={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 8 }}
-                    formatter={(v: number, name: string) => [`${v.toLocaleString()} oz`, name]}
+                    formatter={(v: number, name: string) => [`${v.toFixed(1)} kg`, name]}
                   />
                   <Bar dataKey="capacity" fill="#2d3748" radius={[0, 4, 4, 0]} name="Annual Capacity" />
                   <Bar dataKey="production" fill="#f59e0b" radius={[0, 4, 4, 0]} name="YTD Production" />
@@ -238,17 +251,17 @@ const Statistics: React.FC = () => {
 
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20 }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Export Volume by Destination</h3>
-              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Gold ounces by country</p>
+              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Gold kilograms by country</p>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={exportBreakdown} layout="vertical">
+                <BarChart data={exportBreakdownKg} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" horizontal={false} />
                   <XAxis type="number" tick={{ fill: '#64748b', fontSize: 10 }} tickLine={false} axisLine={false} />
                   <YAxis type="category" dataKey="destination" tick={{ fill: '#94a3b8', fontSize: 11 }} width={160} tickLine={false} />
                   <Tooltip
                     contentStyle={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 8 }}
-                    formatter={(v: number) => [`${v.toLocaleString()} oz`, 'Volume']}
+                    formatter={(v: number) => [`${v.toFixed(1)} kg`, 'Volume']}
                   />
-                  <Bar dataKey="quantityOz" radius={[0, 6, 6, 0]} name="Volume (oz)">
+                  <Bar dataKey="quantityKg" radius={[0, 6, 6, 0]} name="Volume (kg)">
                     {exportBreakdown.map((_, i) => (
                       <Cell key={i} fill={['#f59e0b', '#10b981', '#3b82f6', '#8b5cf6', '#64748b'][i]} />
                     ))}
@@ -264,7 +277,7 @@ const Statistics: React.FC = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #2d3748' }}>
-                  {['Destination', 'Volume (oz)', 'Value (USD)', 'Share', 'Trend'].map(h => (
+                  {['Destination', 'Volume (kg)', 'Value (USD)', 'Share', 'Trend'].map(h => (
                     <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: '#64748b', fontSize: 12, fontWeight: 600 }}>{h}</th>
                   ))}
                 </tr>
@@ -276,7 +289,7 @@ const Statistics: React.FC = () => {
                       {item.flag} {item.destination}
                     </td>
                     <td style={{ padding: '10px 12px', color: '#cbd5e1', fontSize: 13 }}>
-                      {item.quantityOz.toLocaleString()} oz
+                      {(item.quantityOz * OZ_TO_KG).toFixed(1)} kg
                     </td>
                     <td style={{ padding: '10px 12px', color: '#10b981', fontSize: 13, fontWeight: 600 }}>
                       ${(item.valueUSD / 1000000).toFixed(2)}M
@@ -307,17 +320,17 @@ const Statistics: React.FC = () => {
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: 16, marginBottom: 16 }}>
             <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20 }}>
               <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Production by Province</h3>
-              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>YTD gold ounces per province</p>
+              <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>YTD gold kg per province</p>
               <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={provinceStats.filter(p => p.productionOz > 0)}>
+                <BarChart data={provinceStatsKg.filter(p => p.productionOz > 0)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
                   <XAxis dataKey="province" tick={{ fill: '#94a3b8', fontSize: 11 }} tickLine={false} />
                   <YAxis tick={{ fill: '#64748b', fontSize: 11 }} tickLine={false} axisLine={false} />
                   <Tooltip
                     contentStyle={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 8 }}
-                    formatter={(v: number) => [`${v.toLocaleString()} oz`, 'Production']}
+                    formatter={(v: number) => [`${v.toFixed(1)} kg`, 'Production']}
                   />
-                  <Bar dataKey="productionOz" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Production (oz)" />
+                  <Bar dataKey="productionKg" fill="#f59e0b" radius={[4, 4, 0, 0]} name="Production (kg)" />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -348,7 +361,7 @@ const Statistics: React.FC = () => {
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
               <thead>
                 <tr style={{ borderBottom: '1px solid #2d3748' }}>
-                  {['Province', 'Licensed Sites', 'Registered Miners', 'YTD Production (oz)', 'Revenue (USD)', 'Illicit Hotspots'].map(h => (
+                  {['Province', 'Licensed Sites', 'Registered Miners', 'YTD Production (kg)', 'Revenue (USD)', 'Illicit Hotspots'].map(h => (
                     <th key={h} style={{ textAlign: 'left', padding: '8px 12px', color: '#64748b', fontSize: 12, fontWeight: 600 }}>{h}</th>
                   ))}
                 </tr>
@@ -360,7 +373,7 @@ const Statistics: React.FC = () => {
                     <td style={{ padding: '10px 12px', color: '#3b82f6', fontSize: 13 }}>{p.sites}</td>
                     <td style={{ padding: '10px 12px', color: '#f59e0b', fontSize: 13 }}>{p.miners.toLocaleString()}</td>
                     <td style={{ padding: '10px 12px', color: p.productionOz > 0 ? '#10b981' : '#475569', fontSize: 13, fontWeight: p.productionOz > 0 ? 600 : 400 }}>
-                      {p.productionOz > 0 ? p.productionOz.toLocaleString() : '—'}
+                      {p.productionOz > 0 ? `${(p.productionOz * OZ_TO_KG).toFixed(1)} kg` : '—'}
                     </td>
                     <td style={{ padding: '10px 12px', color: p.revenueUSD > 0 ? '#10b981' : '#475569', fontSize: 13 }}>
                       {p.revenueUSD > 0 ? `$${(p.revenueUSD / 1000000).toFixed(1)}M` : '—'}
@@ -392,7 +405,7 @@ const Statistics: React.FC = () => {
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2d3748' }}>
-                    {['Ref', 'Date', 'Actor', 'Action', 'Site', 'Volume', 'Value', 'Destination', 'Royalty', 'Tax', 'Status'].map(h => (
+                    {['Ref', 'Date', 'Actor', 'Action', 'Site', 'Volume (kg)', 'Value', 'Destination', 'Royalty', 'Tax', 'Status'].map(h => (
                       <th key={h} style={{ textAlign: 'left', padding: '8px 10px', color: '#64748b', fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap' }}>{h}</th>
                     ))}
                   </tr>
@@ -409,7 +422,7 @@ const Statistics: React.FC = () => {
                         <td style={{ padding: '10px 10px', color: '#f1f5f9', fontSize: 12 }}>{entry.actor}</td>
                         <td style={{ padding: '10px 10px', color: '#94a3b8', fontSize: 12 }}>{entry.action}</td>
                         <td style={{ padding: '10px 10px', color: '#3b82f6', fontSize: 11, fontFamily: 'monospace' }}>{entry.siteId}</td>
-                        <td style={{ padding: '10px 10px', color: '#f59e0b', fontSize: 12, whiteSpace: 'nowrap' }}>{entry.quantityOz.toLocaleString()} oz</td>
+                        <td style={{ padding: '10px 10px', color: '#f59e0b', fontSize: 12, whiteSpace: 'nowrap' }}>{(entry.quantityOz * OZ_TO_KG).toFixed(2)} kg</td>
                         <td style={{ padding: '10px 10px', color: '#10b981', fontSize: 12, whiteSpace: 'nowrap', fontWeight: 600 }}>
                           ${(entry.valueUSD / 1000).toFixed(0)}K
                         </td>

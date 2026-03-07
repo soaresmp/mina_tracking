@@ -116,9 +116,20 @@ const Dashboard: React.FC = () => {
     { name: 'Closed', value: miningSites.filter(s => s.status === 'closed').length, color: '#ef4444' }
   ];
 
+  const OZ_TO_KG = 0.0311035;
+
   const goldPriceFormatted = kpiData.goldPriceUSDoz.toLocaleString('en-US', {
     style: 'currency', currency: 'USD', maximumFractionDigits: 2
   });
+  const goldPricePerKg = (kpiData.goldPriceUSDoz / OZ_TO_KG).toLocaleString('en-US', {
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0
+  });
+
+  const monthlyStatsKg = monthlyStats.map(m => ({
+    ...m,
+    productionKg: +(m.productionOz * OZ_TO_KG).toFixed(2),
+    exportKg: +(m.exportOz * OZ_TO_KG).toFixed(2)
+  }));
 
   return (
     <div style={{ padding: isMobile ? '16px 12px' : '24px', overflowY: 'auto', height: '100%' }}>
@@ -162,7 +173,7 @@ const Dashboard: React.FC = () => {
       }}>
         <span style={{ fontSize: 20 }}>🥇</span>
         <span style={{ color: '#fbbf24', fontWeight: 700, fontSize: 16 }}>GOLD SPOT PRICE</span>
-        <span style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18 }}>{goldPriceFormatted}/oz</span>
+        <span style={{ color: '#f1f5f9', fontWeight: 700, fontSize: 18 }}>{goldPriceFormatted}/oz · {goldPricePerKg}/kg</span>
         <span style={{ color: '#10b981', fontSize: 14 }}>▲ {kpiData.goldPriceChange24h}% (24h)</span>
         <span style={{ color: '#475569', fontSize: 12, marginLeft: 'auto' }}>
           XAU/USD • LBMA Reference Rate • Updated {currentTime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
@@ -177,7 +188,7 @@ const Dashboard: React.FC = () => {
       }}>
         <KPICard
           title="YTD Production"
-          value={`${kpiData.totalProductionYTDOz.toLocaleString()} oz`}
+          value={`${(kpiData.totalProductionYTDOz * OZ_TO_KG).toFixed(1)} kg`}
           change={`+${kpiData.totalProductionYTDChangePercent}%`}
           changePositive={true}
           subtitle="Gold extracted, all licensed sites"
@@ -210,7 +221,7 @@ const Dashboard: React.FC = () => {
         <KPICard
           title="Licensed Miners"
           value={kpiData.totalLicensedMiners.toLocaleString()}
-          subtitle={`${totalWorkers} registered workers`}
+          subtitle={`${totalWorkers} workers in tracked concessions`}
           icon="👷"
           color="#f97316"
         />
@@ -231,7 +242,7 @@ const Dashboard: React.FC = () => {
         <KPICard
           title="Licensed Operators"
           value={`${actors.filter(a => a.type === 'operator').length}`}
-          subtitle={`${actors.filter(a => a.kycStatus === 'flagged').length} flagged actors`}
+          subtitle={`In-registry (53+ active nationally) · ${actors.filter(a => a.kycStatus === 'flagged').length} flagged`}
           icon="🏢"
           color="#ec4899"
         />
@@ -245,9 +256,9 @@ const Dashboard: React.FC = () => {
           borderRadius: 12, padding: 20
         }}>
           <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Production & Export Trend</h3>
-          <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Monthly gold production vs exports (oz) — Last 12 months</p>
+          <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>Monthly gold production vs exports (kg) — Last 12 months</p>
           <ResponsiveContainer width="100%" height={220}>
-            <AreaChart data={monthlyStats}>
+            <AreaChart data={monthlyStatsKg}>
               <defs>
                 <linearGradient id="prodGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.3} />
@@ -264,10 +275,10 @@ const Dashboard: React.FC = () => {
               <Tooltip
                 contentStyle={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 8 }}
                 labelStyle={{ color: '#94a3b8' }}
-                formatter={(val: number) => [`${val.toLocaleString()} oz`, '']}
+                formatter={(val: number) => [`${val.toFixed(2)} kg`, '']}
               />
-              <Area type="monotone" dataKey="productionOz" stroke="#f59e0b" fill="url(#prodGrad)" strokeWidth={2} name="Production" />
-              <Area type="monotone" dataKey="exportOz" stroke="#10b981" fill="url(#expGrad)" strokeWidth={2} name="Exports" />
+              <Area type="monotone" dataKey="productionKg" stroke="#f59e0b" fill="url(#prodGrad)" strokeWidth={2} name="Production" />
+              <Area type="monotone" dataKey="exportKg" stroke="#10b981" fill="url(#expGrad)" strokeWidth={2} name="Exports" />
               <Legend wrapperStyle={{ color: '#94a3b8', fontSize: 12 }} />
             </AreaChart>
           </ResponsiveContainer>
@@ -338,7 +349,7 @@ const Dashboard: React.FC = () => {
                   {item.flag} {item.destination}
                 </span>
                 <span style={{ fontSize: 12, color: '#94a3b8' }}>
-                  {item.quantityOz.toLocaleString()} oz • ${(item.valueUSD / 1000000).toFixed(1)}M
+                  {(item.quantityOz * OZ_TO_KG).toFixed(1)} kg • ${(item.valueUSD / 1000000).toFixed(1)}M
                 </span>
               </div>
               <div style={{ height: 6, background: '#2d3748', borderRadius: 3 }}>
