@@ -382,26 +382,6 @@ const sources: DataSource[] = [
     lastAccessed: '2025-01-05',
     reliability: 'low',
     notes: 'Used for contextual background only; all specific data points verified against primary sources'
-  },
-
-  // PLATFORM FRAMEWORK
-  {
-    id: 'SRC-021',
-    name: 'CommStack — Mine to Market Platform (EITI Framework)',
-    category: 'regulatory',
-    provider: 'CommStack Ltd (commstack.co.uk)',
-    providerType: 'commercial',
-    description: 'The CommStack Mine-to-Market platform provides the compliance and traceability framework for this implementation. Features incorporated: EITI compliance support, KYC/KYB assessments, financial audit trail, end-to-end ecosystem for traceability, and scalable commodity tracking.',
-    url: 'https://commstack.co.uk',
-    dataTypes: ['EITI compliance framework', 'KYC/KYB assessment methodology', 'Financial audit trail architecture', 'Traceability protocols', 'Trade documentation standards'],
-    coverage: 'Framework — multi-commodity, multi-country',
-    updateFrequency: 'Platform updates',
-    format: 'SaaS platform / API',
-    license: 'Commercial',
-    usedIn: ['Compliance Module — EITI framework', 'Statistics — Audit Trail methodology', 'Registry — KYC/KYB structure', 'Dashboard — Alert framework'],
-    lastAccessed: '2025-03-05',
-    reliability: 'high',
-    notes: 'This MINATRACK platform is built to be compatible with CommStack integration. Full API integration with CommStack backend is the recommended next step for production deployment.'
   }
 ];
 
@@ -671,7 +651,7 @@ const DataSources: React.FC = () => {
           Production volumes, export values and royalty figures presented as real-time or near real-time data are based on the latest available official reports and are
           updated as new disclosures become available. All financial calculations use LBMA gold reference rates. Illicit hotspot intelligence is derived from
           satellite analysis, law enforcement alerts and community reporting — these are intelligence assessments and should not be treated as prosecutorial evidence.
-          Full API integration with MIREME, INAMI, Banco de Moçambique and the CommStack backend is recommended for production deployment to achieve true real-time data flows.
+          Full API integration with MIREME, INAMI and Banco de Moçambique is recommended for production deployment to achieve true real-time data flows.
         </p>
       </div>
     </div>

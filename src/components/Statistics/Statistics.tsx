@@ -399,7 +399,7 @@ const Statistics: React.FC = () => {
           <div style={{ background: '#1e2433', border: '1px solid #2d3748', borderRadius: 12, padding: 20, marginBottom: 20 }}>
             <h3 style={{ color: '#f1f5f9', marginBottom: 4, fontSize: 16 }}>Financial Audit Trail</h3>
             <p style={{ color: '#64748b', fontSize: 12, marginBottom: 16 }}>
-              Complete audit trail of all gold transactions — mine-to-market traceability per CommStack EITI framework
+              Complete audit trail of all gold transactions — mine-to-market traceability per EITI framework
             </p>
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 800 }}>
@@ -460,7 +460,7 @@ const Statistics: React.FC = () => {
               <div style={{ color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
                 Every gold transaction is recorded with a full audit trail covering extraction at source, processing,
                 export certification, royalty payment, and tax compliance. This implementation aligns with the
-                CommStack EITI compliance framework and Mozambique's obligations under the 2019 EITI Standard.
+                EITI compliance framework and Mozambique's obligations under the 2019 EITI Standard.
                 All financial discrepancies trigger automatic alerts to the Anti-Corruption Commission (ACC).
               </div>
             </div>

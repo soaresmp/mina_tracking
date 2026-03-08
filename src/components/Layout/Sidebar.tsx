@@ -138,9 +138,8 @@ const Sidebar: React.FC<SidebarProps> = ({ activePage, onNavigate, collapsed, on
       <div style={{ padding: '12px 8px', borderTop: '1px solid #1e293b' }}>
         {!collapsed && (
           <div style={{ padding: '8px 12px', marginBottom: 8 }}>
-            <div style={{ fontSize: 10, color: '#334155', marginBottom: 3 }}>Powered by</div>
-            <div style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>CommStack EITI Framework</div>
-            <div style={{ fontSize: 10, color: '#334155', marginTop: 2 }}>Mine-to-Market Platform</div>
+            <div style={{ fontSize: 11, color: '#475569', fontWeight: 600 }}>EITI Mine-to-Market Framework</div>
+            <div style={{ fontSize: 10, color: '#334155', marginTop: 2 }}>Republic of Mozambique</div>
           </div>
         )}
         <button
